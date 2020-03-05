@@ -1,0 +1,1107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>CS3mi3 Assignment 2</title>
+<!-- 2019-11-20 Wed 22:16 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="James Zhang" />
+<meta  name="description" content="Work on a simple While language.
+Scope and type-checking done in Agda and Oz."
+ />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">CS3mi3 Assignment 2</h1>
+
+
+
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">Our imperative kernel; <i>Expr₁</i> and <i>While</i></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+In notes 3, we developed languages of integer and boolean expressions,
+as well as a simple imperative kernel language <i>While</i>.
+</p>
+
+<p>
+We repeat them here, with a small extension:
+we allow variables of type <code>Bool</code>, and
+mark the type of variables as either <code>Int</code> or <code>Bool</code> when they are declared.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-text">&#10216;expr&#10217; &#8759;= &#10216;bexpr&#10217; | &#10216;iexpr&#10217;<br>
+<br>
+&#10216;bexpr&#10217; &#8759;= true | false | var<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &#10216;expr&#10217; == &#10216;expr&#10217; | &#10216;expr&#10217; \= &#10216;expr&#10217;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &#10216;iexpr&#10217; =&lt; &#10216;iexpr&#10217; | &#10216;iexpr&#10217; &lt; &#10216;iexpr&#10217;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &#10216;iexpr&#10217; &gt;= &#10216;iexpr&#10217; | &#10216;iexpr&#10217; &gt; &#10216;iexpr&#10217;<br>
+<br>
+&#10216;iexpr&#10217; &#8759;= number | var<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &#10216;iexpr&#10217; + &#10216;iexpr&#10217; | &#10216;iexpr&#10217; - &#10216;iexpr&#10217;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| &#10216;iexpr&#10217; * &#10216;iexpr&#10217; | &#10216;iexpr&#10217; div &#10216;iexpr&#10217; | &#10216;iexpr&#10217; mod &#10216;iexpr&#10217;<br>
+<br>
+&#10216;stmt&#10217; &#8759;=<br>
+&nbsp;&nbsp;skip<br>
+| local var &#8758; (Int | Bool) in &#10216;stmt&#10217;<br>
+| var &#8788; &#10216;expr&#10217;<br>
+| &#10216;stmt&#10217; &#10216;stmt&#10217;<br>
+| if &#10216;bexpr&#10217; then &#10216;stmt&#10217; else &#10216;stmt&#10217;<br>
+| while &#10216;bexpr&#10217; do &#10216;stmt&#10217;<br>
+</p>
+</pre>
+</div>
+
+<p>
+We'll call the new language of expressions <i>Expr₁</i>, as it's a slight
+extension to <i>Expr₀</i> in the notes.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">Task 1 – An attribute grammar for <i>While</i> [20 points]</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Create an attribute grammar which enforces
+the “static semantic” rules of the languages; that is, the
+</p>
+<ul class="org-ul">
+<li>scoping rules (checking that variables are declared before use), and
+</li>
+<li>initialisation rules
+(checking that variables are initialised before they are used).
+</li>
+</ul>
+</div>
+
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1">An attribute grammar for expressions</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+We give each expression two attributes:
+</p>
+<ul class="org-ul">
+<li><code>scope</code>, a set of variables, denoting which variables are currently in scope,
+and
+</li>
+<li><code>assigned</code>, another set of variables, denoting which variables have
+been assigned to.
+</li>
+<li><code>type</code>, a <i>function</i> from variables to the set <code>{Int, Bool}</code>.
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-text">&#10216;expr&#10217; &#8759;= &#10216;bexpr&#10217;<br>
+Rules: &#10216;bexpr&#10217;.scope &#8788; &#10216;expr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;bexpr&#10217;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;bexpr&#10217;.type &#8788; &#10216;bexpr&#10217;.type<br>
+<br>
+&#10216;expr&#10217; &#8759;= &#10216;iexpr&#10217;<br>
+Rules: &#10216;iexpr&#10217;.scope &#8788; &#10216;expr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;bexpr&#10217;.type &#8788; &#10216;bexpr&#10217;.type<br>
+<br>
+-- No rules needed<br>
+&#10216;bexpr&#10217; &#8759;= true<br>
+&#10216;bexpr&#10217; &#8759;= false<br>
+<br>
+-- Need to check that var is in scope, assigned and has type Bool<br>
+&#10216;bexpr&#10217; &#8759;= var<br>
+Rules: var &#8712; &#10216;bexpr&#10217;.scope&nbsp;&nbsp;-- Note: this is a proposition, not an assignment<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var &#8712; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;bexpr&#10217;.type(var) == Bool&nbsp;&nbsp;-- Note: again, a proposition<br>
+<br>
+-- We group together productions whose rules are identical<br>
+&#10216;bexpr&#10217; &#8759;= &#10216;expr&#10217;&#8321; == &#10216;expr&#10217;&#8322;<br>
+&#10216;bexpr&#10217; &#8759;= &#10216;expr&#10217;&#8321; \= &#10216;expr&#10217;&#8322;<br>
+Rules: &#10216;expr&#10217;&#8321;.scope &#8788; &#10216;bexpr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;expr&#10217;&#8321;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;expr&#10217;&#8321;.type &#8788; &#10216;bexpr&#10217;.type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;expr&#10217;&#8322;.scope &#8788; &#10216;bexpr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;expr&#10217;&#8322;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;expr&#10217;&#8322;.type &#8788; &#10216;bexpr&#10217;.type<br>
+<br>
+&#10216;bexpr&#10217; &#8759;= &#10216;iexpr&#10217;&#8321; =&lt; &#10216;iexpr&#10217;&#8322;<br>
+&#10216;bexpr&#10217; &#8759;= &#10216;iexpr&#10217;&#8321; &lt; &#10216;iexpr&#10217;&#8322;<br>
+&#10216;bexpr&#10217; &#8759;= &#10216;iexpr&#10217;&#8321; &gt;= &#10216;iexpr&#10217;&#8322;<br>
+&#10216;bexpr&#10217; &#8759;=&nbsp;&nbsp;&#10216;iexpr&#10217;&#8321; &gt; &#10216;iexpr&#10217;&#8322;<br>
+Rules: &#10216;iexpr&#10217;&#8321;.scope &#8788; &#10216;bexpr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8321;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8321;.type &#8788; &#10216;bexpr&#10217;.type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8322;.scope &#8788; &#10216;bexpr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8322;.assigned &#8788; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8322;.type &#8788; &#10216;bexpr&#10217;.type<br>
+<br>
+-- No rules needed<br>
+&#10216;iexpr&#10217; &#8759;= number<br>
+<br>
+-- Again, check that var is in scope and assigned, but here check it's type Int<br>
+&#10216;iexpr&#10217; &#8759;= var<br>
+Rules: var &#8712; &#10216;bexpr&#10217;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var &#8712; &#10216;bexpr&#10217;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;bexpr&#10217;.type(var) == Int<br>
+<br>
+&#10216;iexpr&#10217;&#8321; &#8759;= &#10216;iexpr&#10217;&#8322; + &#10216;iexpr&#10217;&#8323;<br>
+&#10216;iexpr&#10217;&#8321; &#8759;= &#10216;iexpr&#10217;&#8322; - &#10216;iexpr&#10217;&#8323;<br>
+&#10216;iexpr&#10217;&#8321; &#8759;= &#10216;iexpr&#10217;&#8322; * &#10216;iexpr&#10217;&#8323;<br>
+&#10216;iexpr&#10217;&#8321; &#8759;= &#10216;iexpr&#10217;&#8322; div &#10216;iexpr&#10217;&#8323;<br>
+&#10216;iexpr&#10217;&#8321; &#8759;= &#10216;iexpr&#10217;&#8322; mod &#10216;iexpr&#10217;&#8323;<br>
+Rules: &#10216;iexpr&#10217;&#8322;.scope &#8788; &#10216;iexpr&#10217;&#8321;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8322;.assigned &#8788; &#10216;iexpr&#10217;&#8321;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8322;.type &#8788; &#10216;iexpr&#10217;&#8321;.type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8323;.scope &#8788; &#10216;iexpr&#10217;&#8321;.scope<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8323;.assigned &#8788; &#10216;iexpr&#10217;&#8321;.assigned<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#10216;iexpr&#10217;&#8323;.type &#8788; &#10216;iexpr&#10217;&#8321;.type<br>
+</p>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2">Remaining work: the attribute grammar for statements</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+We need to keep track of <i>.scopes</i> for all the leaves
+ in the statements. For some of the statements, we don't need to check
+ for <i>.assigned</i> because there is no variable being initialized.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-text">&#10216;program&#10217; &#8759;= &#10216;stmt&#10217;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;.scope &#8788; &#8709;<br>
+<br>
+--No rules needed<br>
+&#10216;stmt&#10217;&#8321; &#8759;= skip<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= local var : Int in &#10216;stmt&#10217;&#8322;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope &#8746; {var}<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= local var : Bool in &#10216;stmt&#10217;&#8322;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope &#8746; {var}<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= local var : Bool &#8759;= &#10216;expr&#10217;&#8321;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;expr&#10217;&#8321;.scope &#8746; {var}<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= local var : Int &#8759;= &#10216;expr&#10217;&#8321;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;expr&#10217;&#8321;.scope &#8746; {var}<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;=&nbsp;&nbsp;&#10216;stmt&#10217;&#8322; ; &#10216;stmt&#10217;&#8323;<br>
+Rules:<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope <br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8323;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope <br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8323;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned <br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= if &#10216;bexpr&#10217;&#8321; then &#10216;stmt&#10217;&#8322; else &#10216;stmt&#10217;&#8323;<br>
+Rules: <br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope <br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8323;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope<br>
+&nbsp;&nbsp;&#10216;bexpr&#10217;&#8321;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8323;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned <br>
+&nbsp;&nbsp;&#10216;bexpr&#10217;&#8321;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned<br>
+<br>
+&#10216;stmt&#10217;&#8321; &#8759;= while &#10216;bexpr&#10217;&#8321; do &#10216;stmt&#10217;&#8322; <br>
+Rules: <br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope <br>
+&nbsp;&nbsp;&#10216;bexpr&#10217;&#8321;.scope &#8788; &#10216;stmt&#10217;&#8321;.scope<br>
+&nbsp;&nbsp;&#10216;stmt&#10217;&#8322;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned <br>
+&nbsp;&nbsp;&#10216;bexpr&#10217;&#8321;.assigned &#8788; &#10216;stmt&#10217;&#8321;.assigned<br>
+</p>
+</pre>
+</div>
+
+<p>
+The <code>scope</code> attribute is a set, used to track which variables are in scope.
+The first rule here, for the <code>⟨program⟩</code> non-terminal, “initialises” the scope
+to the empty set, so no variables are in scope.
+The second and third rules, for the <code>⟨stmt⟩</code> non-terminal, says that “inside”
+a local variable declaration statement, the variable being declared is in scope
+(in addition to whatever variables were in scope previously).
+</p>
+
+<p>
+It is probably useful to think of the parse tree of a program
+to understand these rules; the first rule “says”
+“at the root of the tree, no variables are in scope”,
+and the second and third rules “say”
+“in the subtree for <code>⟨stmt⟩₁</code>, <code>var</code> is in scope”.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">Task 2 – A <i>While</i> interpreter in Oz</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+A file <code>macid.oz</code> is provided which includes a
+partially complete representation of
+the <i>Expr₁</i> and <i>While</i> languages.
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1">Part 1 – The partially complete representation [10 points]</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Oz supports both the functional and object oriented langauge,
+(though it does not support inductive datatypes).
+But instead of representing expressions using a class, we choose
+the more basic <i>record's</i>.
+</p>
+
+<p>
+In the functions below, I defined Bool expressions true and false, 
+along with Int expressions int. Those are expression types we need.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-oz">declare
+% constants are records with no fields, just a label
+fun {True} ttt() end
+
+fun {False} fff() end
+
+% operator applications are records with subexpressions
+fun {Eq Subexpr1 Subexpr2} eq(Subexpr1 Subexpr2) end
+
+%Int exprestions
+fun {Int N} int() end
+</pre>
+</div>
+
+<p>
+We have our expressions, now we need to construct functions to show
+the operations between expressions. But before that, we need functions 
+to check the type of expressions so that we can handle errors
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-oz">%find type of expressions
+%function that raises error if input is bool
+fun {IsInt Expr}
+  case Expr
+  of ttt()
+    then '???'
+  [] fff()
+    then '???'
+  else true
+  end
+end
+
+%function that raise erroe if input is Int
+fun {IsBool Expr}
+  case Expr
+  of Int()
+    then '???'
+  else true
+  end
+end
+</pre>
+</div>
+
+<p>
+Now we can define our expression operations
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-oz">%operations of expressions
+fun {NEq Subexpr1 Subexpr2} neq(Subexpr1 Subexpr2) end
+
+fun {GreaterorEqual Subexpr1 Subexpr2} goe(Subexpr1 Subexpr2) end
+
+fun {Greater Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then gre(Subexpr1 Subexpr2) end
+end
+
+fun {LessorEqual Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then loe(Subexpr1 Subexpr2) end
+end
+
+fun {Less Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then les(Subexpr1 Subexpr2) end
+end
+
+fun {Plus Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then plus(Subexpr1 Subexpr2) end
+end
+
+fun {Minus Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then minus(Subexpr1 Subexpr2) end
+end
+
+fun {Times Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then times(Subexpr1 Subexpr2) end
+end
+
+fun {Divs Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then divs(Subexpr1 Subexpr2) end
+end
+
+fun {Mods Subexpr1 Subexpr2}
+  if {And {IsInt Subexpr1} {IsInt Subexpr2}} then mods(Subexpr1 Subexpr2) end
+end
+</pre>
+</div>
+
+<p>
+This representation does not define a type of expressions!
+In other words, we do not get any guarantees from typechecking here;
+there is nothing preventing us from using our interpret on records
+which do not represent valid expressions or statements.
+This means we should always handle error cases!
+</p>
+
+<p>
+As an example use of this representation, and to assist with testing,
+we can define a “pretty printing” function which converts records to strings.
+It makes use of “virtual strings”, which are composed out of atoms and strings
+(see the <a href="https://mozart.github.io/mozart-v1/doc-1.4.0/tutorial/node3.html#label22">Oz documentation</a>).
+</p>
+<div class="org-src-container">
+
+<pre class="src src-oz">% To use this pretty print function with the Browser,
+% enable “Virtual Strings” under “Options → Representations…”
+fun {PrettyPrint Expr}
+  case Expr
+  of ttt()
+     then 'true'
+  [] fff()
+     then 'false'
+  [] eq(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" == "#{PrettyPrint Subexpr2}
+  [] neq(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" /= "#{PrettyPrint Subexpr2}
+  [] goe(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" &gt;= "#{PrettyPrint Subexpr2}
+  [] gre(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" &gt; "#{PrettyPrint Subexpr2}
+  [] loe(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" &lt;= "#{PrettyPrint Subexpr2}
+  [] les(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" &lt; "#{PrettyPrint Subexpr2}
+  [] plus(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" + "#{PrettyPrint Subexpr2}
+  [] minus(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" - "#{PrettyPrint Subexpr2}
+  [] times(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" * "#{PrettyPrint Subexpr2}
+  [] divs(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" div "#{PrettyPrint Subexpr2}
+  [] mods(Subexpr1 Subexpr2)
+     then {PrettyPrint Subexpr1}#" mod "#{PrettyPrint Subexpr2}
+  else '???' % error case
+  end
+end
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2">Part 2 – A <i>While</i> interpreter [20 points]</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Create an interpreter for this representation of the <i>While</i> language.
+</p>
+
+<p>
+Your interpreter does not have to check/report “static semantic” errors;
+that is, you may assume that it is only used on correct programs.
+It should “fail gracefully” if such errors are found, though.
+</p>
+
+<p>
+TODO&#x2013;Everyone is confused about this part. 
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4">Task 3 – A <i>While</i> representation in Agda</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+In Agda, we will use the expressivity of dependent types
+in order to produce a representation of <i>While</i> programs
+<i>which prevents “incorrect” programs</i>!
+</p>
+
+<p>
+Specifically, starting from a relatively simple representation,
+we will refine our type declarations to prevent
+</p>
+<ul class="org-ul">
+<li>typing errors,
+</li>
+<li>scoping errors, and
+</li>
+<li>use of uninitialised variables.
+</li>
+</ul>
+</div>
+
+
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1">Part 1 – Preventing incorrectly typed programs [10 points]</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+The section below is same as part 0
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">module WellTypedPrograms where
+  infix 100 var&#7477; var&#7470; const
+  infix 90 _*_ _div_ _mod_
+  infix 85 _+_ _-_
+  infix 80 _=&lt;_ _&lt;_ _&gt;=_ _&gt;_
+  infix 75 _\=_
+  infix 70 _==_
+  infix 65 _&#8788;&#7477;_ _&#8788;&#7470;_
+  infix 60 _&#10814;_
+
+  data Expr : Set
+
+  data BExpr : Set
+
+  data IExpr : Set
+
+  data Expr where
+    _:Bool : BExpr &#8594; Expr
+    _:Int : IExpr &#8594; Expr
+</pre>
+</pre>
+</div>
+
+<p>
+Now it's the part we need to be more careful. 
+The input for int comparisons such as <i>&lt;=</i>, <i>&lt;</i>
+can only be <i>IExpr</i>, so we change it.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">data BExpr where
+  true false : BExpr
+  var&#7470; : Var&#7470; &#8594; BExpr
+  _==_ _\=_ : Expr &#8594; Expr &#8594; BExpr
+  _=&lt;_ _&lt;_ _&gt;=_ _&gt;_ : IExpr &#8594; IExpr &#8594; BExpr
+</pre>
+</pre>
+</div>
+
+<p>
+Same idea, input for int calculation can only be <i>IExpr</i>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">data IExpr where
+  const : &#8484; &#8594; IExpr
+  var&#7477; : Var&#7477; &#8594; IExpr
+  _+_ _-_ _*_ _div_ _mod_ : IExpr &#8594; IExpr &#8594; IExpr
+
+data Stmt : Set where
+  skip : Stmt
+  localInt_In_end : Var&#7477; &#8594; Stmt &#8594; Stmt
+  localBool_In_end : Var&#7470; &#8594; Stmt &#8594; Stmt
+  _&#8788;&#7470;_ : Var&#7470; &#8594; BExpr &#8594; Stmt
+  _&#8788;&#7477;_ : Var&#7477; &#8594; IExpr &#8594; Stmt
+  _&#10814;_ : Stmt &#8594; Stmt &#8594; Stmt
+  if_then_else_end : BExpr &#8594; Stmt &#8594; Stmt &#8594; Stmt
+  while_Do_end : BExpr &#8594; Stmt &#8594; Stmt
+</pre>
+</pre>
+</div>
+
+<p>
+Some sample code down blow. The module is now well-typed, but
+there are still scope and initialization error in it
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">_ : Stmt
+_ = skip
+
+_ : Stmt
+_ = if true then skip else skip end
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- Only IExpr can be assigned to variables now</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- Only BExpr can be as an while condition</span>
+_ : Stmt
+_ = localInt x In
+      x &#8788;&#7477; (const (pos zero) ) &#10814;
+      while ( (const (pos zero)) &lt; const (pos (suc (suc (suc zero))))) Do
+        x &#8788;&#7477; ( (const (pos zero)) + const (pos (suc zero)))
+      end
+    end
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- Now only int value can be assigned to an integer variable.</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- Still a scope error that x is not declared.</span>
+_ : Stmt
+_ = x &#8788;&#7477; (const( pos(zero)))
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- now only BExpr can be as an if condition</span>
+_ : Stmt
+_ = if true then skip else skip end
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">-- Initialize error: Variable used before initialisation</span>
+_ : Stmt
+_ = localBool b In
+      if true then skip else skip end
+    end
+</pre>
+</pre>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2">Part 2 – Preventing incorrectly scoped programs [20 points]</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+First, I worked to make some the test cases for this part before the test
+cases were given. It can be checked by looking at the test cases file
+I uploaded to the repo. Hope I can get some bonus because of it. 
+</p>
+
+<p>
+We use work from part 1 here.
+</p>
+
+<p>
+Our goal here is to define a function <code>WellScoped</code> of type <code>Stmt → Set</code>
+(that is, <code>WellScoped</code> is a predicate).
+</p>
+
+<p>
+<code>WellScoped S</code> should be non-empty iff <code>S</code> is a well-scoped program;
+that is, if all variables are declared using a <code>local</code> statement
+before they are used.
+</p>
+
+<p>
+To help accomplish this, below is defined the notion of a scope;
+a scope is a predicate on variables.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-agda2">module WellScoped where
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Bring your datatypes from part 1 into scope</span>
+  open WellTypedPrograms
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Scopes for integer variables</span>
+  Scope&#7477; : Set&#8321;
+  Scope&#7477; = (v : Var&#7477;) &#8594; Set
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- The empty scope is false for every variable</span>
+  EmptyScope&#7477; : Scope&#7477;
+  EmptyScope&#7477; v = Falsehood
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Adding a variable to a scope</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- &#8220;Add v ToScope&#7477; S&#8221; is a new predicate on variables</span>
+  Add_ToScope&#7477;_ : Var&#7477; &#8594; Scope&#7477; &#8594; Scope&#7477;
+  (Add v ToScope&#7477; S) w = (v &#8801; w) &#8744; S w
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- And we define the same concepts for boolean variables</span>
+
+  Scope&#7470; : Set&#8321;
+  Scope&#7470; = (v : Var&#7470;) &#8594; Set
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- The empty scope is false for every variable</span>
+  EmptyScope&#7470; : Scope&#7470;
+  EmptyScope&#7470; v = Falsehood
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Adding a variable to a scope</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- &#8220;Add v ToScope&#7477; S&#8221; is a new predicate on variables</span>
+  Add_ToScope&#7470;_ : Var&#7470; &#8594; Scope&#7470; &#8594; Scope&#7470;
+  (Add v ToScope&#7470; S) w = (v &#8801; w) &#8744; S w
+</pre>
+</pre>
+</div>
+
+<p>
+If we want to check if something is wellscoped, first we
+need to check if something is in the scope. We want to check
+if a variable is in scope by looking into Expr. 
+Note that there are two different types of Expr, we want to look into 
+them both. We not only want to check if IExpr is in scope<sup>I</sup>, but we
+also need to check if all the nodes of it are in scope<sup>B</sup>. Because for
+comparison of integers, the return type is bool. We won't go into
+those integer scopes from scope<sup>I</sup> side, we have to go from scope<sup>B</sup>. 
+So we have <i><span class="underline">IntoSpecial</span></i>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">mutual
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--Special function to check scope for IExpr in the case of: (IExpr &#8728; IExpr &#8594; BExpr), where &#8728; is (==, /=, &lt;, &lt;=...)</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--We have to define a new function for this because we are checking int from a bool scope</span>
+  _IntoSpecial_ : BExpr &#8594; Scope&#7477; &#8594; Set
+  true IntoSpecial x&#8322; = Truth
+  false IntoSpecial x&#8322; = Truth
+  var&#7470; x&#8321; IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) == (x&#8323; :Bool)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) == (x&#8323; :Int)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) == (x&#8323; :Bool)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) == (x&#8323; :Int)) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+  ((x&#8321; :Bool) \= (x&#8323; :Bool)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) \= (x&#8323; :Int)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) \= (x&#8323; :Bool)) IntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) \= (x&#8323; :Int)) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+  (x&#8321; =&lt; x&#8323;) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+  (x&#8321; &lt; x&#8323;) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+  (x&#8321; &gt;= x&#8323;) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+  (x&#8321; &gt; x&#8323;) IntoSpecial x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+</pre>
+</pre>
+</div>
+
+<p>
+Now we define functions of checking if variables in IExpr, BExpr are in Scope<sup>I</sup>,
+Scope<sup>B</sup> respectively, by looking into the Expr.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2"><span style="color: #b22222; font-size: 9.959999999999999pt;">--Function that check if the variables in IExpr are in Scope&#7477;</span>
+_IntoIExpr_ : IExpr &#8594; Scope&#7477; &#8594; Set
+const x&#8321; IntoIExpr x&#8322; = Truth
+var&#7477; x&#8321; IntoIExpr x&#8322; = (Add x&#8321; ToScope&#7477; x&#8322;) x&#8321;
+(x&#8321; + x&#8323;) IntoIExpr x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+(x&#8321; - x&#8323;) IntoIExpr x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+(x&#8321; * x&#8323;) IntoIExpr x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+(x&#8321; div x&#8323;) IntoIExpr x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+(x&#8321; mod x&#8323;) IntoIExpr x&#8322; = (x&#8321; IntoIExpr x&#8322;) &#8743; (x&#8323; IntoIExpr x&#8322;)
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">--Function that check if the variables in BExpr are in Scope&#7470;</span>
+
+_IntoBExpr_ : BExpr &#8594; Scope&#7470; &#8594; Set
+true IntoBExpr x&#8322; = Truth
+false IntoBExpr x&#8322; = Truth
+var&#7470; x&#8321; IntoBExpr x&#8322; = (Add x&#8321; ToScope&#7470; x&#8322;) x&#8321;
+((x&#8321; :Bool) == (x&#8323; :Bool)) IntoBExpr x&#8322; = (x&#8321; IntoBExpr x&#8322;) &#8743; (x&#8323; IntoBExpr x&#8322;)
+((x&#8321; :Int) == (x&#8323; :Int)) IntoBExpr x&#8322; = Truth
+((x&#8321; :Bool) \= (x&#8323; :Bool)) IntoBExpr x&#8322; = (x&#8321; IntoBExpr x&#8322;) &#8743; (x&#8323; IntoBExpr x&#8322;)
+((x&#8321; :Int) \= (x&#8323; :Int)) IntoBExpr x&#8322; = Truth
+((x&#8322; :Bool) == (x&#8323; :Int)) IntoBExpr x&#8321; = Falsehood
+((x&#8322; :Int) == (x&#8323; :Bool)) IntoBExpr x&#8321; = Falsehood
+((x&#8322; :Bool) \= (x&#8323; :Int)) IntoBExpr x&#8321; = Falsehood
+((x&#8322; :Int) \= (x&#8323; :Bool)) IntoBExpr x&#8321; = Falsehood
+(x&#8321; =&lt; x&#8323;) IntoBExpr x&#8322; = Truth
+(x&#8321; &lt; x&#8323;) IntoBExpr x&#8322; = Truth
+(x&#8321; &gt;= x&#8323;) IntoBExpr x&#8322; = Truth
+(x&#8321; &gt; x&#8323;) IntoBExpr x&#8322; = Truth
+</pre>
+</pre>
+</div>
+
+<p>
+Now we define functions of checking if statements are well-scoped. We
+can define functions using what we have above. We need to check for
+int and bool respectively. We Only add variable into Scope when there are 
+<i>localInt</i> or <i>localBool</i> called
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2"><span style="color: #b22222; font-size: 9.959999999999999pt;">--Check if the variables from statements are in Scope&#7477; </span>
+_WithinScope&#7477;_ : Stmt &#8594; Scope&#7477; &#8594; Set
+skip WithinScope&#7477; x&#8322; = Truth
+localInt x&#8321; In x&#8323; end WithinScope&#7477; x&#8322; = (Add x&#8321; ToScope&#7477; x&#8322;) x&#8321; &#8743; (x&#8323; WithinScope&#7477; x&#8322;) 
+localBool x&#8321; In x&#8323; end WithinScope&#7477; x&#8322; = x&#8323; WithinScope&#7477; x&#8322;
+(x&#8321; &#8788;&#7470; x&#8323;) WithinScope&#7477; x&#8322; = Truth
+(x&#8321; &#8788;&#7477; x&#8323;) WithinScope&#7477; x&#8322; = (x&#8323; IntoIExpr x&#8322;)
+(x&#8321; &#10814; x&#8323;) WithinScope&#7477; x&#8322; = (x&#8323; WithinScope&#7477; x&#8322;) &#8743; (x&#8321; WithinScope&#7477; x&#8322;)
+if x&#8321; then x&#8323; else x&#8324; end WithinScope&#7477; x&#8322; = ((x&#8323; WithinScope&#7477; x&#8322;) &#8743; (x&#8324; WithinScope&#7477; x&#8322;)) &#8743; (x&#8321; IntoSpecial x&#8322;)
+while x&#8321; Do x&#8323; end WithinScope&#7477; x&#8322; = (x&#8323; WithinScope&#7477; x&#8322;) &#8743; (x&#8321; IntoSpecial x&#8322;)
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">--Check if Variables from Statements are in Scope&#7470;</span>
+_WithinScope&#7470;_ : Stmt &#8594; Scope&#7470; &#8594; Set
+skip WithinScope&#7470; x&#8322; = Truth 
+localInt x&#8321; In x&#8323; end WithinScope&#7470; x&#8322; = (x&#8323; WithinScope&#7470; x&#8322;) 
+localBool x&#8321; In x&#8323; end WithinScope&#7470; x&#8322; = (Add x&#8321; ToScope&#7470; x&#8322;) x&#8321; &#8743; (x&#8323; WithinScope&#7470; x&#8322;)
+(x&#8321; &#8788;&#7470; x&#8323;) WithinScope&#7470; x&#8322; = (x&#8323; IntoBExpr x&#8322;)
+(x&#8321; &#8788;&#7477; x&#8323;) WithinScope&#7470; x&#8322; = Truth
+(x&#8321; &#10814; x&#8323;) WithinScope&#7470; x&#8322; = (x&#8323; WithinScope&#7470; x&#8322;) &#8743; (x&#8321; WithinScope&#7470; x&#8322;)
+if x&#8321; then x&#8323; else x&#8324; end WithinScope&#7470; x&#8322; = (x&#8321; IntoBExpr x&#8322;) &#8743; ((x&#8324; WithinScope&#7470; x&#8322;) &#8743; (x&#8323; WithinScope&#7470; x&#8322;))
+while x&#8321; Do x&#8323; end WithinScope&#7470; x&#8322; = (x&#8321; IntoBExpr x&#8322;) &#8743; (x&#8323; WithinScope&#7470; x&#8322;)
+
+_WellScoped : Stmt &#8594; Set
+x&#8321; WellScoped = (x&#8321; WithinScope&#7477; EmptyScope&#7477;) &#8743; (x&#8321; WithinScope&#7470; EmptyScope&#7470;)
+</pre>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3">Part 3 – Preventing use of uninitialised variables [20 points]</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+Now we want to check if the program(statement) is well-initialized. We
+can do it very similar to the way we check for well-scoped
+above. First the defination of Initialised. We check if a program is
+well-initialised by checking if variables are in a set called
+<i>Initial</i>. We have it for both <i>Int</i> and <i>Bool</i>. 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">module WellInitialised where
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Bring your datatypes from part 1 into scope</span>
+  open WellTypedPrograms
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Initial for integer variables</span>
+  Initial&#7477; : Set&#8321;
+  Initial&#7477; = (v : Var&#7477;) &#8594; Set
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- The empty Initial is false for every variable</span>
+  EmptyInitial&#7477; : Initial&#7477;
+  EmptyInitial&#7477; v = Falsehood
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Adding a variable to a scope</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- &#8220;Add v ToInitial&#7477; S&#8221; is a new predicate on variables</span>
+  Add_ToInitial&#7477;_ : Var&#7477; &#8594; Initial&#7477; &#8594; Initial&#7477;
+  (Add v ToInitial&#7477; S) w = (v &#8801; w) &#8744; S w
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- And we define the same concepts for boolean variables</span>
+  Initial&#7470; : Set&#8321;
+  Initial&#7470; = (v : Var&#7470;) &#8594; Set
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- The empty scope is false for every variable</span>
+  EmptyInitial&#7470; : Initial&#7470;
+  EmptyInitial&#7470; v = Falsehood
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- Adding a variable to a Initial</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">-- &#8220;Add v ToInitial&#7477; S&#8221; is a new predicate on variables</span>
+  Add_ToInitial&#7470;_ : Var&#7470; &#8594; Initial&#7470; &#8594; Initial&#7470;
+  (Add v ToInitial&#7470; S) w = (v &#8801; w) &#8744; S w
+</pre>
+</pre>
+</div>
+
+<p>
+Everything is exactly same as what we need to do for checking
+well-scoped. First we need the function that goes into <i>Expr</i> checking
+if every variable is initialed there. We need to do it for both <i>Bool</i>
+and <i>Int</i>. We also need a special function that check the case of (int
+== int -&gt; bool). Which means we check the integer member of the elements that
+form a bool.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">mutual
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--Special function to check Initial for IExpr in the case of: (IExpr &#8728; IExpr &#8594; BExpr), where &#8728; is (==, /=, &lt;, &lt;=...)</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--We have to define a new function for this because we are checking int from a bool expression</span>
+  _IIntoSpecial_ : BExpr &#8594; Initial&#7477; &#8594; Set
+  true IIntoSpecial x&#8322; = Truth
+  false IIntoSpecial x&#8322; = Truth
+  var&#7470; x&#8321; IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) == (x&#8323; :Bool)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) == (x&#8323; :Int)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) == (x&#8323; :Bool)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) == (x&#8323; :Int)) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  ((x&#8321; :Bool) \= (x&#8323; :Bool)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Bool) \= (x&#8323; :Int)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) \= (x&#8323; :Bool)) IIntoSpecial x&#8322; = Truth
+  ((x&#8321; :Int) \= (x&#8323; :Int)) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; =&lt; x&#8323;) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; &lt; x&#8323;) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; &gt;= x&#8323;) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; &gt; x&#8323;) IIntoSpecial x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--Function that check if the variables in IExpr are in Initial&#7477;</span>
+  _IIntoIExpr_ : IExpr &#8594; Initial&#7477; &#8594; Set
+  const x&#8321; IIntoIExpr x&#8322; = Truth
+  var&#7477; x&#8321; IIntoIExpr x&#8322; = (Add x&#8321; ToInitial&#7477; x&#8322;) x&#8321;
+  (x&#8321; + x&#8323;) IIntoIExpr x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; - x&#8323;) IIntoIExpr x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; * x&#8323;) IIntoIExpr x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; div x&#8323;) IIntoIExpr x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+  (x&#8321; mod x&#8323;) IIntoIExpr x&#8322; = (x&#8321; IIntoIExpr x&#8322;) &#8743; (x&#8323; IIntoIExpr x&#8322;)
+
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">--Function that check if the variables in BExpr are in Initial&#7470;</span>
+
+  _IIntoBExpr_ : BExpr &#8594; Initial&#7470; &#8594; Set
+  true IIntoBExpr x&#8322; = Truth
+  false IIntoBExpr x&#8322; = Truth
+  var&#7470; x&#8321; IIntoBExpr x&#8322; = (Add x&#8321; ToInitial&#7470; x&#8322;) x&#8321;
+  ((x&#8321; :Bool) == (x&#8323; :Bool)) IIntoBExpr x&#8322; = (x&#8321; IIntoBExpr x&#8322;) &#8743; (x&#8323; IIntoBExpr x&#8322;)
+  ((x&#8321; :Int) == (x&#8323; :Int)) IIntoBExpr x&#8322; = Truth
+  ((x&#8321; :Bool) \= (x&#8323; :Bool)) IIntoBExpr x&#8322; = (x&#8321; IIntoBExpr x&#8322;) &#8743; (x&#8323; IIntoBExpr x&#8322;)
+  ((x&#8321; :Int) \= (x&#8323; :Int)) IIntoBExpr x&#8322; = Truth
+  ((x&#8322; :Bool) == (x&#8323; :Int)) IIntoBExpr x&#8321; = Falsehood
+  ((x&#8322; :Int) == (x&#8323; :Bool)) IIntoBExpr x&#8321; = Falsehood
+  ((x&#8322; :Bool) \= (x&#8323; :Int)) IIntoBExpr x&#8321; = Falsehood
+  ((x&#8322; :Int) \= (x&#8323; :Bool)) IIntoBExpr x&#8321; = Falsehood
+  (x&#8321; =&lt; x&#8323;) IIntoBExpr x&#8322; = Truth
+  (x&#8321; &lt; x&#8323;) IIntoBExpr x&#8322; = Truth
+  (x&#8321; &gt;= x&#8323;) IIntoBExpr x&#8322; = Truth
+  (x&#8321; &gt; x&#8323;) IIntoBExpr x&#8322; = Truth
+</pre>
+</pre>
+</div>
+
+<p>
+Now, same as the Well-scope. We check if everything is well-scoped by
+going into statements. We only want to add new Item to Initial when
+there is <i>:=</i> operation. 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2"><span style="color: #b22222; font-size: 9.959999999999999pt;">--Only add new item to the Initial&#7477; when there is &#8788;&#7477; operation</span>
+_WithinInitial&#7477;_ : Stmt &#8594; Initial&#7477; &#8594; Set
+skip WithinInitial&#7477; x&#8322; = Truth
+localInt x&#8321; In x&#8323; end WithinInitial&#7477; x&#8322; =  (x&#8323; WithinInitial&#7477; x&#8322;)
+localBool x&#8321; In x&#8323; end WithinInitial&#7477; x&#8322; = x&#8323; WithinInitial&#7477; x&#8322;
+(x&#8321; &#8788;&#7470; x&#8323;) WithinInitial&#7477; x&#8322; = Truth
+(x&#8321; &#8788;&#7477; x&#8323;) WithinInitial&#7477; x&#8322; = (Add x&#8321; ToInitial&#7477; x&#8322;) x&#8321;
+(x&#8321; &#10814; x&#8323;) WithinInitial&#7477; x&#8322; = (x&#8323; WithinInitial&#7477; x&#8322;) &#8743; (x&#8321; WithinInitial&#7477; x&#8322;)
+if x&#8321; then x&#8323; else x&#8324; end WithinInitial&#7477; x&#8322; = (x&#8324; WithinInitial&#7477; x&#8322;) &#8743;( (x&#8323; WithinInitial&#7477; x&#8322;) &#8743; (x&#8321; IIntoSpecial x&#8322;))
+while x&#8321; Do x&#8323; end WithinInitial&#7477; x&#8322; = (x&#8323; WithinInitial&#7477; x&#8322;) &#8743; ((x&#8321; IIntoSpecial x&#8322;))
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">--Only add new item to the Initial&#7470; when there are &#8788;&#7477; or &#8788;&#7470; operation, since</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">--sometimes we need to check if IExpr is in Initial&#7470;</span>
+_WithinInitial&#7470;_ : Stmt &#8594; Initial&#7470; &#8594; Set
+skip WithinInitial&#7470; x&#8322; = Truth
+localInt x&#8321; In x&#8323; end WithinInitial&#7470; x&#8322; = x&#8323; WithinInitial&#7470; x&#8322;
+localBool x&#8321; In x&#8323; end WithinInitial&#7470; x&#8322; =  (x&#8323; WithinInitial&#7470; x&#8322;)
+(x&#8321; &#8788;&#7470; x&#8323;) WithinInitial&#7470; x&#8322; = (Add x&#8321; ToInitial&#7470; x&#8322;) x&#8321;
+(x&#8321; &#8788;&#7477; x&#8323;) WithinInitial&#7470; x&#8322; = Truth
+(x&#8321; &#10814; x&#8323;) WithinInitial&#7470; x&#8322; = (x&#8323; WithinInitial&#7470; x&#8322;) &#8743; (x&#8321; WithinInitial&#7470; x&#8322;)
+if x&#8321; then x&#8323; else x&#8324; end WithinInitial&#7470; x&#8322; = ((x&#8323; WithinInitial&#7470; x&#8322;) &#8743; (x&#8324; WithinInitial&#7470; x&#8322;))
+while x&#8321; Do x&#8323; end WithinInitial&#7470; x&#8322; = x&#8323; WithinInitial&#7470; x&#8322;
+
+_WellInitialised : Stmt &#8594; Set
+I WellInitialised = (I WithinInitial&#7477; EmptyInitial&#7477;) &#8743; (I WithinInitial&#7470; EmptyInitial&#7470;)
+</pre>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4">Part 4 (Bonus) – An interpreter which works only on “correct” programs [20 points]</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+I would have finished it if the change that oz was considered bonus
+was announced earlier, also if the complete test cases were given as
+the same time of assignment. I would have more time and a better mind
+to do on this part. Although, I have a good idea about how to start it.
+</p>
+
+<p>
+Just like in homework 6. We can have a State in both Bool and
+Int. After each Statement operation we update both the bool and int
+states. While at the same time we call <i>_WellScoped</i> and
+<i>_WellInitialised</i> to check the variables are Scoped and
+Initialised. If any variable is used before Scope/initial then we abort
+the program by raising error.
+</p>
+
+<p>
+I only have a beginning of it. Hope I can get some mark just because
+of my explaination. Please!
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-agda2">module Correct where
+  open WellTypedPrograms
+  open WellScoped
+
+  State&#7477; : Set
+  State&#7477; = Var&#7477; &#8594; &#8484;
+
+  State&#7470; : Set
+  State&#7470; = Var&#7470; &#8594; BExpr
+
+  _case&#7477;_ :  Stmt &#8594; State&#7477; &#8594; Stmt
+  skip case&#7477; x&#8322; = skip
+  localInt x&#8321; In x&#8323; end case&#7477; x&#8322; = {!!}
+  localBool x&#8321; In x&#8323; end case&#7477; x&#8322; = {!!}
+  (x&#8321; &#8788;&#7470; x&#8323;) case&#7477; x&#8322; = {!!}
+  (x&#8321; &#8788;&#7477; x&#8323;) case&#7477; x&#8322; = {!!}
+  (x&#8321; &#10814; x&#8323;) case&#7477; x&#8322; = {!!}
+  if x&#8321; then x&#8323; else x&#8324; end case&#7477; x&#8322; = {!!}
+  while x&#8321; Do x&#8323; end case&#7477; x&#8322; = {!!}
+
+  _case&#7470;_ :  Stmt &#8594; State&#7470; &#8594; Stmt
+  skip case&#7470; x&#8322; = skip
+  localInt x&#8321; In x&#8323; end case&#7470; x&#8322; = {!!}
+  localBool x&#8321; In x&#8323; end case&#7470; x&#8322; = {!!}
+  (x&#8321; &#8788;&#7470; x&#8323;) case&#7470; x&#8322; = {!!}
+  (x&#8321; &#8788;&#7477; x&#8323;) case&#7470; x&#8322; = {!!}
+  (x&#8321; &#10814; x&#8323;) case&#7470; x&#8322; = {!!}
+  if x&#8321; then x&#8323; else x&#8324; end case&#7470; x&#8322; = {!!}
+  while x&#8321; Do x&#8323; end case&#7470; x&#8322; = {!!}
+</pre>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: James Zhang</p>
+<p class="date">Created: 2019-11-20 Wed 22:16</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.3.50.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

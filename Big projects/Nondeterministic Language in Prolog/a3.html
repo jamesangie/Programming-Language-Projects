@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>CS3mi3 Assignment 3</title>
+<!-- 2019-12-03 Tue 00:58 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="James Zhang" />
+<meta  name="description" content="Reasoning about a small nondeterministic language in Prolog."
+ />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">CS3mi3 Assignment 3</h1>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">A nondeterministic language, <i>Nondet</i></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+For this assignment, we will reason about a new little language,
+which we call <i>Nondet</i>.
+</p>
+
+<p>
+<i>Nondet</i> includes only integer variables and constants,
+an assignment statement,
+and composition statements.
+The unique feature of <i>Nondet</i> is that
+it has <b>two</b> ways to compose programs, which we call
+<code>sequence</code> and <code>either</code>.
+</p>
+
+<p>
+A CFG for <i>Nondet</i>:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-text">&#10216;stmt&#10217; &#8759;= assign ( var , int )<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | sequence ( &#10216;stmt&#10217; , &#10216;stmt&#10217; )<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | either ( &#10216;stmt&#10217; , &#10216;stmt&#10217; )<br>
+</p>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1">Informal semantics of <i>Nondet</i></h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The informal semantics of <i>Nondet</i> are:
+</p>
+<ul class="org-ul">
+<li>Executing <code>assign(X,I)</code> assigns the integer constant <code>I</code> to <code>X</code>.
+</li>
+<li><code>sequence(S₁,S₂)</code> executes <code>S₁</code>, and then executes <code>S₂</code>.
+</li>
+<li><code>either(S₁,S₂)</code> executes one of <code>S₁</code> or <code>S₂</code>, but not the other.
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">Task 1 – Inference rules [20 marks]</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Create a set of inference rules giving the small-step semantics
+of <i>Nondet</i>.
+</p>
+
+<p>
+Define a relation <code>_⟶_ : Stmt × State → Stmt × State</code>,
+where <code>State</code> is a functio from variables to integers.
+(We do not include an environment in the semantics of this language).
+</p>
+
+<p>
+First we need to define States. States is a function from variables to
+integers:
+</p>
+
+<p>
+<code>State = Var → ℕ</code>
+</p>
+
+<p>
+Now we need to define assigning values to a variable.
+<code>x≔i</code> means assigning <code>i</code> to <code>x</code>
+</p>
+
+<p>
+<code>_[_≔_] : State → Var → ℕ → State</code>
+</p>
+
+<p>
+<code>(σ [ x ≔ n ]) x = n</code>
+</p>
+
+<p>
+<code>(σ [ x ≔ n ]) y = σ x</code>
+</p>
+
+<p>
+Now we can define statements. <code>Stmt</code> is statements is one of:
+<code>skip</code>, <code>assign</code>, <code>either</code> and <code>sequence</code>.
+<code>Skip</code> is just skip. <code>aasign</code> means assigning values to
+variables. <code>either</code> means one of the input statements is
+executed. <code>sequence</code> means executing first input statement then the
+second one in order.
+</p>
+
+<p>
+<code>skip : Stmt</code>
+</p>
+
+<p>
+<code>assign(a, b) : Variable × Int → Stmt</code>
+</p>
+
+<p>
+<code>either(s1, s2) : Stmt × Stmt → Stmt</code>
+</p>
+
+<p>
+<code>sequence(s1, s2) : Stmt × Stmt → Stmt</code>
+</p>
+
+<p>
+Now we are good to define the reduction relation:
+</p>
+
+<p>
+<code>_⟶_ : Stmt × State → Stmt × State</code>
+</p>
+
+<p>
+Break into different cases:
+</p>
+
+<p>
+<code>(skip, σ) ⟶ (skip, σ)</code>
+</p>
+
+<p>
+<code>(assign(a, b), σ) ⟶ (skip, σ [a ≔ b])</code>
+</p>
+
+<p>
+Depends on different situations, for <code>either(s1, s2)</code>, it may go to
+either of <code>s1</code> or <code>s2</code>. Similiar to the non-deterministic language
+that one state is pointing to two other state at the same time. Only
+one of the output state is possible. 
+</p>
+
+<p>
+<code>(either(s1, s2), σ) ⟶ (s1, σ) or (s2, σ)</code>
+</p>
+
+<p>
+For <code>sequence(s1, s2)</code>, we execute <code>s1</code> first, then <code>s2</code>. We can use
+<code>s1 ; s2</code> to show this relation.
+</p>
+
+<p>
+<code>(sequence(s1, s2), σ) ⟶ (s1, σ) ; (s2, σ)</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">Task 2 – <i>Nondet</i> in Prolog [20 marks]</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The meaning of <code>mightAssign(S,X,I)</code> is that, after executing
+the statement <code>S</code>, the variable <code>X</code> might be assigned value <code>I</code>.
+</p>
+
+<p>
+The statements should be of the forms
+</p>
+<ul class="org-ul">
+<li><code>assign(X,I)</code>,
+</li>
+<li><code>sequence(S1,S2)</code>, and
+</li>
+<li><code>either(S1,S2)</code>.
+</li>
+</ul>
+
+<p>
+At first we define the statements in our language. First 
+we define the statement needed. Which are, first, assign(X, I),
+basicly assigning an interger value I to a variable X.
+We also type check if the input has the correct type.
+X should be atom and I should be integer
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #0000ff; font-size: 9.959999999999999pt;">assign</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if the inputs are correct by type checking</span>
+  atom(<span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>),
+  integer(<span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+Second, either(S1, S2). It has two inpus S1 and S2, which are
+both statements. It basiclly only executes S1 or S2, but not both.
+We also need to do the type check here. the input S1, S2 has to be 
+statements. In our language here the statements are one of <i>assign()</i>,
+<i>either()</i> or <i>sequence()</i>. So that we have the well-typed input
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #0000ff; font-size: 9.959999999999999pt;">either</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Type check for statements S1 and S2. they need to both be one of:</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">assign(), either() or sequence()</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>),
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+The last, we define sequence(S1, S2). It has two inputs 
+which are statements. We need to do the same type check as for <i>either()</i>
+What it does is: execute first statements S1, then execute second statement S2.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #0000ff; font-size: 9.959999999999999pt;">sequence</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Type check same as for either(). S1 and S2 need to both be one of:</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">assign(), either() or sequence()</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>),
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+I have defined the format of the statements, we can now define the 
+mightAssign() which checks: after executing the statement <code>S</code>, whether
+or not the variable <code>X</code> is assigned value <code>I</code>.
+</p>
+
+<p>
+We need to split the case of <code>S</code>. There are three possibilities for
+<code>S</code> which are <i>assign()</i>, <i>either()</i> and <i>sequence()</i>. We then need to
+define different relations for these three cases.
+</p>
+
+<p>
+First we have <code>mightAssign(assign(A, B), X, I)</code>. To check if <code>X</code> is 
+assigned to <code>I</code>, for case <code>S = assign(A, B)</code> we just need to check if
+<code>X = A</code> and <code>I = B</code>. 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is assign()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">A</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">B</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Compare if A = X and B = I. If they are both correct then X and I</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">are assigned together well. </span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">A</span> = <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>,
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span> = <span style="color: #a0522d; font-size: 9.959999999999999pt;">B</span>.
+</pre>
+</pre>
+</div>
+
+<p>
+Now we define the relation in case <code>S = either(S1, S2)</code>. When <code>S =
+either(S1, S2)</code>, we only execute one of the statements S1 or S2. Then
+we can use <code>;</code>, which similar to <i>or</i> in logic. We then can go into
+one of the branches which <code>X</code> is assigned to <code>I</code> in it.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is either()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">use ; to excute one of the statements</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+We now need to define the relation for last case: <code>sequence(S1,
+S2)</code>. When <code>S = sequence(S1,S2)</code>, we execute <i>S1</i> first, then
+<i>S2</i>. Then in order to check if <i>X</i> is assigned to <i>I</i>, we need to
+first check if <i>X</i> is assigned to <i>I</i> in S2. If it is assigned then we
+are good. It doesn't matter that <i>X</i> is assigned to other values in
+<i>S1</i>, since <i>S2</i> is the final statements. However, if it is not
+assigned in <i>S2</i> then we need to check into S1. We only need to check
+into <i>S1</i> when there is no assignment of <i>X</i> in <i>S2</i>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is sequence()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">first check if X is assigned in S2. If yes then we are good</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">check if X is assigned in S1, while X is not re-assigned in S2.</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Since we only want to check the final value of X assigns to.</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>),
+  \+ mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4">Task 3 – Adding one more command [Bonus: 10 marks]</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+<code>both(S₁,S₂)</code> evaluates both of <code>S₁</code> and <code>S₂</code>, but not in a defined order.
+<code>S₁</code> may be evaluated first, or <code>S₂</code> may be evaluated first,
+or the two may be evaluated concurrently (control flow may pass back and forth).
+</p>
+
+<p>
+First we define everything from Task 2, but note that now we have one
+more statement so we need to change some of the type check. 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">First we define the statement needed. Which are, first, assign(X, I),</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">basicly assigning an interger value I to a variable X.</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">assign</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if the inputs are correct by type checking</span>
+  atom(<span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>),
+  integer(<span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>).
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Second, either(S1, S2). It has two inpus S1 and S2, which are</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">both statements. It basiclly only executes S1 or S2, but not both  </span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">either</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Type check for statements S1 and S2. they need to both be one of:</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">assign(), either(), both() or sequence()</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>),
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">sequence(S1, S2). It has two inputs which are statements.</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Execute first statements S1, then execute second statement S2</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">sequence</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Type check same as for either(). S1 and S2 need to both be one of:</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">assign(), either() both() or sequence()</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>),
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+
+
+<p>
+And then we add <code>both(S1, S2)</code>, the relation itself is exactly same as
+for <code>either()</code> or <code>sequence()</code>.
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">both(S1, S2). It has two inputs which are statements.</span>
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">The order of executing these two statements is not defined.</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">both</span>(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Type check same as for either(). S1 and S2 need to both be one of:</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">assign(), either() or sequence()</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>),
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span> = assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span> = both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+Then the <code>mightAssign()</code> for <code>assign()</code>, <code>either()</code> and
+<code>sequence()</code>. They are exactly same as before:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is assign()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(assign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">A</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">B</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Compare if A = X and B = I. If they are both correct then X and I</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">are assigned together well. </span>
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">A</span> = <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>,
+  <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span> = <span style="color: #a0522d; font-size: 9.959999999999999pt;">B</span>.
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is either()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">use ; to excute one of the statements. </span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>).
+
+<span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is sequence()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">first check if X is assigned in S2. If yes then we are good</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">check if X is assigned in S1, while X is not re-assigned in S2.</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Since we only want to check the final value of X assigns to.</span>
+  mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>),
+  \+ mightAssign(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">_</span>).
+</pre>
+</pre>
+</div>
+
+<p>
+Now the case for <code>S = both(S1, S2)</code>. The order of going into <code>S1</code> or <code>S2</code>
+is not defined. So we just try all the possible orders. If in any of
+the possible order <code>X</code> is assigned to <code>I</code>, then we are
+good. We can just use the relations we defined earlier. Therefore, we have:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog"><span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">Check if X is assigned with I, when the statement is sequence()</span>
+<span style="color: #0000ff; font-size: 9.959999999999999pt;">mightAssign</span>(both(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>) :-
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">The order of executing S1 and S2 in not defined.</span>
+  <span style="color: #b22222; font-size: 9.959999999999999pt;">% </span><span style="color: #b22222; font-size: 9.959999999999999pt;">So we just try all the orders, if one of these is possible then we are good.</span>
+  mightAssign(either(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  mightAssign(sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>)<span style="color: #a020f0; font-size: 9.959999999999999pt;">;</span>
+  mightAssign(sequence(<span style="color: #a0522d; font-size: 9.959999999999999pt;">S2</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">S1</span>), <span style="color: #a0522d; font-size: 9.959999999999999pt;">X</span>, <span style="color: #a0522d; font-size: 9.959999999999999pt;">I</span>).
+</pre>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Wednesday November 30th, 2019</p>
+<p class="author">Author: James Zhang</p>
+<p class="date">Created: 2019-12-03 Tue 00:58</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.3.50.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
